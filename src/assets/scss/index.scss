@@ -1,0 +1,48 @@
+@import "main";
+
+body {
+  margin: 0;
+}
+
+.no-bullets {
+  list-style-type: none;
+}
+
+.container {
+  &-splash-screen {
+    height: 100vh;
+  }
+  &-footer { }
+  &-nav {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-left: auto;
+    margin-right: auto;
+
+  }
+}
+
+.nav {
+  &__logo {
+    align-self: flex-start;
+  }
+  &__content {
+    align-self: flex-end;
+    display: flex;
+    flex-direction: row;
+    &-item {
+      text-transform: uppercase;
+      font-size: .7142em;
+      padding: .5rem .7rem;
+      line-height: 1.625rem;
+      color: white;
+    }
+  }
+}
+
+.margin-right-5{
+  margin-right: 5px;
+}

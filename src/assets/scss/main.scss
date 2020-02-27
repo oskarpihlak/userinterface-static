@@ -1,0 +1,50 @@
+@import 'styles/variables';
+@import 'styles/mixins';
+
+// Plugins CSS
+@import "styles/plugins/plugin-bootstrap-switch";
+@import "styles/plugins/plugin-nouislider";
+@import "styles/plugins/plugin-datepicker";
+
+// Core CSS
+@import "styles/buttons";
+@import "styles/inputs";
+@import "styles/checkboxes-radio";
+@import "styles/progress";
+@import "styles/badges";
+@import "styles/pagination";
+@import "styles/typography";
+@import "styles/misc";
+@import "styles/pills";
+
+// components
+@import "styles/nucleo-outline";
+
+@import "styles/tabs";
+@import "styles/navbar";
+@import "styles/dropdown";
+@import "styles/alerts";
+@import "styles/images";
+@import "styles/popups";
+@import "styles/modals";
+@import "styles/carousel";
+@import "styles/footers";
+
+// Cards
+@import "styles/cards";
+@import "styles/cards/card-plain";
+@import "styles/cards/card-signup";
+
+// example pages and sections
+@import "styles/example-pages";
+@import "styles/sections";
+
+
+@import "styles/responsive";
+
+// Element UI plugins
+@import "styles/element-ui-plugins/carousel";
+@import "styles/element-ui-plugins/date_picker";
+@import "styles/element-ui-plugins/input";
+@import "styles/element-ui-plugins/tooltip";
+@import "styles/element-ui-plugins/popover";

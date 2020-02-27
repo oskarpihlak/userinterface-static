@@ -1,18 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
-  <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:300,400,400i|Nunito:300,300i" rel="stylesheet">
-  <link rel="shortcut icon" type="image/png" href="../img/favicon.png">
-  <title>Dawn</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:300,400,400i|Nunito:300,300i" rel="stylesheet">
+    <link rel="shortcut icon" type="image/png" href="public/img/favicon.png">
+    <link href=https://use.fontawesome.com/releases/v5.0.6/css/all.css rel=stylesheet>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>Dawn</title>
 </head>
 <body>
-  <h1>webpack starter</h1>
-  <img src="../img/back.jpg" height="1000" width="1500"/>
-  cooloooooo
-  <p>✨ A lightweight foundation for your next webpack based frontend project.</p>
+<header>
+    <!-- Navigation bar -->
+    <nav class="navbar navbar-expand-lg fixed-top bg-primary">
+        <div class="container-nav">
+            <div class="nav__logo">
+                <a data-v-1825c779="" href="#/" class="navbar-brand active router-link-active el-popover__reference"
+                   aria-describedby="el-popover-3621" tabindex="0">Zero Dawn</a>
+            </div>
+            <div class="nav__content">
+                <ul class="navbar-nav ml-auto">
+                    <li data-v-1825c779="" class="nav-item">
+                        <a data-v-1825c779="" href="#/store" target="_self" class="nav-link">
+                            <i data-v-1825c779="" class="now-ui-icons shopping_cart-simple"></i>
+                            <p data-v-1825c779="">Store</p></a>
+                    </li>
+                    <li data-v-1825c779="" aria-haspopup="true" class="dropdown nav-item dropdown">
+                        <a data-toggle="dropdown" class="dropdown-toggle nav-link">
+                            <i class="now-ui-icons education_atom"></i>
+                            <span class="no-icon">Services</span></a>
+                        <ul class="dropdown-menu">
+                            <a data-v-1825c779="" href="#/photography" class="dropdown-item">
+                                <i data-v-1825c779="" class="now-ui-icons media-1_camera-compact"></i> Photography/ film
+                                making</a>
+                            <a data-v-1825c779="" href="#/website-design" class="dropdown-item">
+                                <i data-v-1825c779="" class="now-ui-icons tech_tv"></i> Website creation</a>
+                            <a data-v-1825c779="" href="#/branding-marketing" class="dropdown-item">
+                                <i data-v-1825c779="" class="now-ui-icons business_bulb-63"></i> Branding/ marketing</a>
+                        </ul>
+                    </li>
+                    <li data-v-1825c779="" aria-haspopup="true" class="dropdown nav-item dropdown">
+                        <a data-toggle="dropdown" class="dropdown-toggle nav-link">
+                            <i class="now-ui-icons users_single-02"></i>
+                            <span class="no-icon">User</span></a>
+                        <ul class="dropdown-menu"><a data-v-1825c779="" href="#/login" class="dropdown-item">
+                            <i data-v-1825c779="" class="now-ui-icons users_circle-08"></i> Login</a>
+                            <a data-v-1825c779="" href="#/profile" class="dropdown-item">
+                                <i data-v-1825c779="" class="now-ui-icons users_single-02"></i> Profile</a>
+                        </ul>
+                    </li>
+                    <li data-v-1825c779="" class="nav-item">
+                        <a data-v-1825c779="" rel="tooltip" title="Follow us on Twitter" data-placement="bottom"
+                           href="https://twitter.com/ZeroDawn5" target="_blank" class="nav-link">
+                            <i data-v-1825c779="" class="fab fa-twitter"></i>
+                            <p data-v-1825c779="" class="d-lg-none d-xl-none">Twitter</p>
+                        </a>
+                    </li>
+                    <li data-v-1825c779="" class="nav-item">
+                        <a data-v-1825c779="" rel="tooltip" title="Like us on Facebook" data-placement="bottom"
+                           href="https://www.facebook.com/Zero-Dawn-5-102183721363173" target="_blank" class="nav-link">
+                            <i data-v-1825c779="" class="fab fa-facebook-square"></i>
+                            <p data-v-1825c779="" class="d-lg-none d-xl-none">Facebook</p>
+                        </a>
+                    </li>
+                    <li data-v-1825c779="" class="nav-item">
+                        <a data-v-1825c779="" rel="tooltip" title="Follow us on Instagram" data-placement="bottom"
+                           href="https://www.instagram.com/zerodawn5/" target="_blank" class="nav-link">
+                            <i data-v-1825c779="" class="fab fa-instagram"></i>
+                            <p data-v-1825c779="" class="d-lg-none d-xl-none">Instagram</p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<main>
+    <section id="splashScreen" class="container-splash-screen">
+
+    </section>
+    <section id="gallery">
+
+    </section>
+    <section id="blog">
+
+    </section>
+    <section id="aboutThePeopleWorkingHere">
+
+    </section>
+    <section id="customersReviews"></section>
+</main>
+<footer data-background-color="black" class="footer">
+    <div class="container container-footer">
+        <nav>
+            <ul>
+                <li>
+                    <a href="">Zero Dawn</a>
+                </li>
+                <li>
+                    <a href="">About Us</a>
+                </li>
+                <li>
+                    <a href="">Blog</a>
+                </li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            © 2020, Designed by
+            <a href="" target="_blank" rel="noopener">Zero Dawn</a>.
+        </div>
+    </div>
+</footer>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
 </body>
 </html>
