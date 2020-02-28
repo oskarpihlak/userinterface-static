@@ -1,126 +1,1314 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:300,400,400i|Nunito:300,300i" rel="stylesheet">
-    <link rel="shortcut icon" type="image/png" href="public/img/favicon.png">
-    <link href=https://use.fontawesome.com/releases/v5.0.6/css/all.css rel=stylesheet>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <title>Dawn</title>
+    <meta charset="utf-8">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon.png">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta content="width=device-width,initial-scale=1,maximum-scale=1.5,user-scalable=1,shrink-to-fit=no"
+          name="viewport">
+    <title>Zero Dawn</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet">
+    <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+    <script type="text/javascript">// Promises
+    var _eid_promises = {};
+    // Turn the incoming message from extension
+    // into pending Promise resolving
+    window.addEventListener("message", function (event) {
+        if (event.source !== window) return;
+        if (event.data.src && (event.data.src === "background.js")) {
+            console.log("Page received: ");
+            console.log(event.data);
+            // Get the promise
+            if (event.data.nonce) {
+                var p = _eid_promises[event.data.nonce];
+                // resolve
+                if (event.data.result === "ok") {
+                    if (event.data.signature !== undefined) {
+                        p.resolve({hex: event.data.signature});
+                    } else if (event.data.version !== undefined) {
+                        p.resolve(event.data.extension + "/" + event.data.version);
+                    } else if (event.data.cert !== undefined) {
+                        p.resolve({hex: event.data.cert});
+                    } else {
+                        console.log("No idea how to handle message");
+                        console.log(event.data);
+                    }
+                } else {
+                    // reject
+                    p.reject(new Error(event.data.result));
+                }
+                delete _eid_promises[event.data.nonce];
+            } else {
+                console.log("No nonce in event msg");
+            }
+        }
+    }, false);
+
+
+    function TokenSigning() {
+        function nonce() {
+            var val = "";
+            var hex = "abcdefghijklmnopqrstuvwxyz0123456789";
+            for (var i = 0; i < 16; i++) val += hex.charAt(Math.floor(Math.random() * hex.length));
+            return val;
+        }
+
+        function messagePromise(msg) {
+            return new Promise(function (resolve, reject) {
+                // amend with necessary metadata
+                msg["nonce"] = nonce();
+                msg["src"] = "page.js";
+                // send message
+                window.postMessage(msg, "*");
+                // and store promise callbacks
+                _eid_promises[msg.nonce] = {
+                    resolve: resolve,
+                    reject: reject
+                };
+            });
+        }
+
+        this.getCertificate = function (options) {
+            var msg = {type: "CERT", lang: options.lang, filter: options.filter};
+            console.log("getCertificate()");
+            return messagePromise(msg);
+        };
+        this.sign = function (cert, hash, options) {
+            var msg = {
+                type: "SIGN",
+                cert: cert.hex,
+                hash: hash.hex,
+                hashtype: hash.type,
+                lang: options.lang,
+                info: options.info
+            };
+            console.log("sign()");
+            return messagePromise(msg);
+        };
+        this.getVersion = function () {
+            console.log("getVersion()");
+            return messagePromise({
+                type: "VERSION"
+            });
+        };
+    }</script>
+    <script type="text/javascript" src="chrome-extension://aadgmnobpdmgmigaicncghmmoeflnamj/ng-inspector.js"></script>
 </head>
-<body>
-<header>
-    <!-- Navigation bar -->
-    <nav class="navbar navbar-expand-lg fixed-top bg-primary">
-        <div class="container-nav">
-            <div class="nav__logo">
-                <a data-v-1825c779="" href="#/" class="navbar-brand active router-link-active el-popover__reference"
-                   aria-describedby="el-popover-3621" tabindex="0">Zero Dawn</a>
+<body class="sidebar-collapse index-page" data-gr-c-s-loaded="true">
+<noscript><strong>We're sorry but vue-now-ui-kit doesn't work properly without JavaScript enabled. Please enable it to
+    continue.</strong></noscript>
+<div id="app">
+    <nav data-v-1825c779="" class="navbar navbar-transparent navbar-expand-lg fixed-top">
+        <div class="container">
+            <div class="navbar-translate"><a data-v-1825c779="" href="#/"
+                                             class="navbar-brand active router-link-active el-popover__reference"
+                                             aria-describedby="el-popover-3826" tabindex="0">Zero Dawn</a><span
+                    data-v-1825c779=""><div role="tooltip" id="el-popover-3826" aria-hidden="true"
+                                            class="el-popover el-popper popover" tabindex="0"
+                                            style="width: 200px; display: none;"><!----><div data-v-1825c779=""
+                                                                                             class="popover-body">The place where creativity happens</div></div></span>
+                <button type="button" data-toggle="collapse" data-target="#navbar"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+                        class="navbar-toggler collapsed"><span class="navbar-toggler-bar top-bar"></span><span
+                        class="navbar-toggler-bar middle-bar"></span><span class="navbar-toggler-bar bottom-bar"></span>
+                </button>
             </div>
-            <div class="nav__content">
+            <div data-color="orange" id="navigation" class="navbar-collapse collapse">
                 <ul class="navbar-nav ml-auto">
-                    <li data-v-1825c779="" class="nav-item">
-                        <a data-v-1825c779="" href="#/store" target="_self" class="nav-link">
-                            <i data-v-1825c779="" class="now-ui-icons shopping_cart-simple"></i>
-                            <p data-v-1825c779="">Store</p></a>
-                    </li>
-                    <li data-v-1825c779="" aria-haspopup="true" class="dropdown nav-item dropdown">
-                        <a data-toggle="dropdown" class="dropdown-toggle nav-link">
-                            <i class="now-ui-icons education_atom"></i>
-                            <span class="no-icon">Services</span></a>
-                        <ul class="dropdown-menu">
-                            <a data-v-1825c779="" href="#/photography" class="dropdown-item">
-                                <i data-v-1825c779="" class="now-ui-icons media-1_camera-compact"></i> Photography/ film
-                                making</a>
-                            <a data-v-1825c779="" href="#/website-design" class="dropdown-item">
-                                <i data-v-1825c779="" class="now-ui-icons tech_tv"></i> Website creation</a>
-                            <a data-v-1825c779="" href="#/branding-marketing" class="dropdown-item">
-                                <i data-v-1825c779="" class="now-ui-icons business_bulb-63"></i> Branding/ marketing</a>
+                    <li data-v-1825c779="" class="nav-item"><a data-v-1825c779="" href="#/store" target="_self"
+                                                               class="nav-link"><i data-v-1825c779=""
+                                                                                   class="now-ui-icons shopping_cart-simple"></i>
+                        <p data-v-1825c779="">Store</p></a></li>
+                    <li data-v-1825c779="" aria-haspopup="true" class="dropdown nav-item dropdown"><a
+                            data-toggle="dropdown" class="dropdown-toggle nav-link"><i
+                            class="now-ui-icons education_atom"></i><span class="no-icon">Services</span></a>
+                        <ul class="dropdown-menu"><a data-v-1825c779="" href="#/photography" class="dropdown-item"><i
+                                data-v-1825c779="" class="now-ui-icons media-1_camera-compact"></i> Photography/ film
+                            making</a><a data-v-1825c779="" href="#/website-design" class="dropdown-item"><i
+                                data-v-1825c779="" class="now-ui-icons tech_tv"></i> Website creation</a><a
+                                data-v-1825c779="" href="#/branding-marketing" class="dropdown-item"><i
+                                data-v-1825c779="" class="now-ui-icons business_bulb-63"></i> Branding/ marketing</a>
                         </ul>
                     </li>
-                    <li data-v-1825c779="" aria-haspopup="true" class="dropdown nav-item dropdown">
-                        <a data-toggle="dropdown" class="dropdown-toggle nav-link">
-                            <i class="now-ui-icons users_single-02"></i>
-                            <span class="no-icon">User</span></a>
-                        <ul class="dropdown-menu"><a data-v-1825c779="" href="#/login" class="dropdown-item">
-                            <i data-v-1825c779="" class="now-ui-icons users_circle-08"></i> Login</a>
-                            <a data-v-1825c779="" href="#/profile" class="dropdown-item">
-                                <i data-v-1825c779="" class="now-ui-icons users_single-02"></i> Profile</a>
-                        </ul>
+                    <li data-v-1825c779="" aria-haspopup="true" class="dropdown nav-item dropdown"><a
+                            data-toggle="dropdown" class="dropdown-toggle nav-link"><i
+                            class="now-ui-icons users_single-02"></i><span class="no-icon">User</span></a>
+                        <ul class="dropdown-menu"><a data-v-1825c779="" href="#/login" class="dropdown-item"><i
+                                data-v-1825c779="" class="now-ui-icons users_circle-08"></i> Login</a><a
+                                data-v-1825c779="" href="#/profile" class="dropdown-item"><i data-v-1825c779=""
+                                                                                             class="now-ui-icons users_single-02"></i>
+                            Profile</a></ul>
                     </li>
-                    <li data-v-1825c779="" class="nav-item">
-                        <a data-v-1825c779="" rel="tooltip" title="Follow us on Twitter" data-placement="bottom"
-                           href="https://twitter.com/ZeroDawn5" target="_blank" class="nav-link">
-                            <i data-v-1825c779="" class="fab fa-twitter"></i>
-                            <p data-v-1825c779="" class="d-lg-none d-xl-none">Twitter</p>
-                        </a>
-                    </li>
-                    <li data-v-1825c779="" class="nav-item">
-                        <a data-v-1825c779="" rel="tooltip" title="Like us on Facebook" data-placement="bottom"
-                           href="https://www.facebook.com/Zero-Dawn-5-102183721363173" target="_blank" class="nav-link">
-                            <i data-v-1825c779="" class="fab fa-facebook-square"></i>
-                            <p data-v-1825c779="" class="d-lg-none d-xl-none">Facebook</p>
-                        </a>
-                    </li>
-                    <li data-v-1825c779="" class="nav-item">
-                        <a data-v-1825c779="" rel="tooltip" title="Follow us on Instagram" data-placement="bottom"
-                           href="https://www.instagram.com/zerodawn5/" target="_blank" class="nav-link">
-                            <i data-v-1825c779="" class="fab fa-instagram"></i>
-                            <p data-v-1825c779="" class="d-lg-none d-xl-none">Instagram</p>
-                        </a>
-                    </li>
+                    <li data-v-1825c779="" class="nav-item"><a data-v-1825c779="" rel="tooltip"
+                                                               title="Follow us on Twitter" data-placement="bottom"
+                                                               href="https://twitter.com/ZeroDawn5" target="_blank"
+                                                               class="nav-link"><i data-v-1825c779=""
+                                                                                   class="fab fa-twitter"></i>
+                        <p data-v-1825c779="" class="d-lg-none d-xl-none">Twitter</p></a></li>
+                    <li data-v-1825c779="" class="nav-item"><a data-v-1825c779="" rel="tooltip"
+                                                               title="Like us on Facebook" data-placement="bottom"
+                                                               href="https://www.facebook.com/Zero-Dawn-5-102183721363173"
+                                                               target="_blank" class="nav-link"><i data-v-1825c779=""
+                                                                                                   class="fab fa-facebook-square"></i>
+                        <p data-v-1825c779="" class="d-lg-none d-xl-none">Facebook</p></a></li>
+                    <li data-v-1825c779="" class="nav-item"><a data-v-1825c779="" rel="tooltip"
+                                                               title="Follow us on Instagram" data-placement="bottom"
+                                                               href="https://www.instagram.com/zerodawn5/"
+                                                               target="_blank" class="nav-link"><i data-v-1825c779=""
+                                                                                                   class="fab fa-instagram"></i>
+                        <p data-v-1825c779="" class="d-lg-none d-xl-none">Instagram</p></a></li>
                 </ul>
             </div>
         </div>
     </nav>
-</header>
-<main>
-    <section id="splashScreen" class="container-splash-screen">
+    <div class="wrapper">
+        <div>
+            <div filter-color="orange" class="page-header clear-filter">
+                <div class="page-header-image"
+                     style="background-image: url(&quot;public/img/header.jpg&quot;); transform: translate3d(0px, 0px, 0px);"></div>
+                <div class="container">
+                    <div class="content-center brand"><img src="public/img/zero-dawn-logo.png" alt="" class="n-logo">
+                        <h1 class="h1-seo">Zero dawn.</h1>
+                        <h3>Strech out your inner rebel.</h3></div>
+                </div>
+            </div>
+            <div class="main">
+                <div class="section section-images"></div>
+            </div>
+            <div id="basic-elements" class="section section-basic">
+                <div class="container"><h3 class="title">Basic Elements</h3><h4>Buttons</h4>
+                    <p class="category">Pick your style</p>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <button type="button" class="btn btn-primary"><!---->Default<!----></button>
+                            <button type="button" class="btn btn-round btn-primary"><!---->Round<!----></button>
+                            <button type="button" class="btn btn-round btn-primary"><!----><i
+                                    class="now-ui-icons ui-2_favourite-28"></i> With Icon
+                                <!----></button>
+                            <button type="button" class="btn btn-icon btn-round btn-primary"><!----><i
+                                    class="now-ui-icons ui-2_favourite-28"></i><!----></button>
+                            <button type="button" class="btn btn-simple btn-round btn-primary"><!---->Simple
+                                <!----></button>
+                        </div>
+                    </div>
+                    <p class="category">Pick your size</p>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <button type="button" class="btn btn-primary btn-sm"><!---->Small<!----></button>
+                            <button type="button" class="btn btn-primary"><!---->Regular<!----></button>
+                            <button type="button" class="btn btn-primary btn-lg"><!---->Large<!----></button>
+                        </div>
+                    </div>
+                    <p class="category">Pick your color</p>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <button type="button" class="btn btn-default"><!---->Default<!----></button>
+                            <button type="button" class="btn btn-primary"><!---->Primary<!----></button>
+                            <button type="button" class="btn btn-info"><!---->Info<!----></button>
+                            <button type="button" class="btn btn-success"><!---->Success<!----></button>
+                            <button type="button" class="btn btn-warning"><!---->Warning<!----></button>
+                            <button type="button" class="btn btn-danger"><!---->Danger<!----></button>
+                            <button type="button" class="btn btn-neutral"><!---->Neutral<!----></button>
+                        </div>
+                    </div>
+                    <h4>Links</h4>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <button type="button" class="btn btn-link btn-default"><!---->Default<!----></button>
+                            <button type="button" class="btn btn-link btn-primary"><!---->Primary<!----></button>
+                            <button type="button" class="btn btn-link btn-info"><!---->Info<!----></button>
+                            <button type="button" class="btn btn-link btn-success"><!---->Success<!----></button>
+                            <button type="button" class="btn btn-link btn-warning"><!---->Warning<!----></button>
+                            <button type="button" class="btn btn-link btn-danger"><!---->Danger<!----></button>
+                            <button type="button" class="btn btn-link btn-neutral"><!---->Neutral<!----></button>
+                        </div>
+                    </div>
+                    <div class="space-70"></div>
+                    <div id="inputs"><h4>Inputs</h4>
+                        <p class="category">Form Controls</p>
+                        <div class="row">
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="form-group"><!---->
+                                    <div class=""><!----><input aria-describedby="addon-right addon-left"
+                                                                placeholder="Regular" class="form-control"><!---->
+                                        <!----></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="form-group has-success"><!---->
+                                    <div class=""><!----><input aria-describedby="addon-right addon-left"
+                                                                class="form-control valid"><!----><!----></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="form-group has-danger"><!---->
+                                    <div class=""><!----><input aria-describedby="addon-right addon-left"
+                                                                class="form-control valid"><!----><!----></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="form-group input-group"><!---->
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><i
+                                                class="input-group-text now-ui-icons users_single-02"></i></div>
+                                        <input aria-describedby="addon-right addon-left" placeholder="Left Nucleo Icon"
+                                               class="form-control"><!----><!----></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="form-group input-group"><!---->
+                                    <div class="input-group"><!----><input aria-describedby="addon-right addon-left"
+                                                                           placeholder="Right Nucleo Icon"
+                                                                           class="form-control"><span
+                                            class="input-group-addon input-group-append"><i
+                                            class="input-group-text now-ui-icons users_single-02"></i></span><!---->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="form-group no-border input-group"><!---->
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><i
+                                                class="input-group-text now-ui-icons users_single-02"></i></div>
+                                        <input aria-describedby="addon-right addon-left"
+                                               placeholder="No border left icon" class="form-control"><!----><!---->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="form-group no-border input-group"><!---->
+                                    <div class="input-group"><!----><input aria-describedby="addon-right addon-left"
+                                                                           placeholder="No border right icon"
+                                                                           class="form-control"><span
+                                            class="input-group-addon input-group-append"><i
+                                            class="input-group-text now-ui-icons users_single-02"></i></span><!---->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-70"></div>
+                    <div id="checkRadios" class="row">
+                        <div class="col-sm-6 col-lg-3"><p class="category">Checkboxes</p>
+                            <div class="form-check"><label for="39f6321cc9fb5" class="form-check-label"><input
+                                    id="39f6321cc9fb5" type="checkbox" class="form-check-input"><span
+                                    class="form-check-sign"></span>Unchecked</label></div>
+                            <div class="form-check"><label for="5dfb4c0bfd112" class="form-check-label"><input
+                                    id="5dfb4c0bfd112" type="checkbox" class="form-check-input"><span
+                                    class="form-check-sign"></span>Checked</label></div>
+                            <div class="form-check disabled"><label for="e70291061fba" class="form-check-label"><input
+                                    id="e70291061fba" type="checkbox" disabled="disabled" class="form-check-input"><span
+                                    class="form-check-sign"></span>Disabled Unchecked</label></div>
+                            <div class="form-check disabled"><label for="59c7d5c67cab1" class="form-check-label"><input
+                                    id="59c7d5c67cab1" type="checkbox" disabled="disabled"
+                                    class="form-check-input"><span class="form-check-sign"></span>Disabled
+                                Checked</label></div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3"><p class="category">Radios</p>
+                            <div class="form-check form-check-radio"><label for="ec3c04a5f23e2"
+                                                                            class="form-check-label"><input
+                                    id="ec3c04a5f23e2" type="radio" class="form-check-input" value="1"><span
+                                    class="form-check-sign"></span>Radio is On</label></div>
+                            <div class="form-check form-check-radio"><label for="ca77a8ff1846b"
+                                                                            class="form-check-label"><input
+                                    id="ca77a8ff1846b" type="radio" class="form-check-input" value="2"><span
+                                    class="form-check-sign"></span>Radio is Off</label></div>
+                            <div class="form-check form-check-radio disabled"><label for="9ff0257377347"
+                                                                                     class="form-check-label"><input
+                                    id="9ff0257377347" type="radio" disabled="disabled" class="form-check-input"
+                                    value="1"><span class="form-check-sign"></span>Disabled radio is on</label></div>
+                            <div class="form-check form-check-radio disabled"><label for="0cc8c0b29ecfb"
+                                                                                     class="form-check-label"><input
+                                    id="0cc8c0b29ecfb" type="radio" disabled="disabled" class="form-check-input"
+                                    value="2"><span class="form-check-sign"></span>Disabled radio is off</label></div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3"><p class="category">Toggle buttons</p>
+                            <div class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-animate bootstrap-switch-on">
+                                <div class="bootstrap-switch-container"><span class="bootstrap-switch-handle-on ">
 
-    </section>
-    <section id="gallery">
+      </span><span class="bootstrap-switch-label"></span><span
+                                        class="bootstrap-switch-handle-off bootstrap-switch-default">
 
-    </section>
-    <section id="blog">
-
-    </section>
-    <section id="aboutThePeopleWorkingHere">
-
-    </section>
-    <section id="customersReviews"></section>
-</main>
-<footer data-background-color="black" class="footer">
-    <div class="container container-footer">
-        <nav>
-            <ul>
-                <li>
-                    <a href="">Zero Dawn</a>
-                </li>
-                <li>
-                    <a href="">About Us</a>
-                </li>
-                <li>
-                    <a href="">Blog</a>
-                </li>
-            </ul>
-        </nav>
-        <div class="copyright">
-            © 2020, Designed by
-            <a href="" target="_blank" rel="noopener">Zero Dawn</a>.
+      </span></div>
+                            </div>
+                            <br>
+                            <div class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-animate bootstrap-switch-off">
+                                <div class="bootstrap-switch-container"><span class="bootstrap-switch-handle-on ">
+        ON
+      </span><span class="bootstrap-switch-label"></span><span
+                                        class="bootstrap-switch-handle-off bootstrap-switch-default">
+        OFF
+      </span></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3"><p class="category">Sliders</p>
+                            <div class="slider slider- noUi-target noUi-ltr noUi-horizontal">
+                                <div class="noUi-base">
+                                    <div class="noUi-connects">
+                                        <div class="noUi-connect"
+                                             style="transform: translate(0%, 0px) scale(0.3, 1);"></div>
+                                    </div>
+                                    <div class="noUi-origin" style="transform: translate(-70%, 0px); z-index: 4;">
+                                        <div class="noUi-handle noUi-handle-lower" data-handle="0" tabindex="0"
+                                             role="slider" aria-orientation="horizontal" aria-valuemin="0.0"
+                                             aria-valuemax="100.0" aria-valuenow="30.0" aria-valuetext="30.00"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="slider slider-primary noUi-target noUi-ltr noUi-horizontal">
+                                <div class="noUi-base">
+                                    <div class="noUi-connects">
+                                        <div class="noUi-connect"
+                                             style="transform: translate(20%, 0px) scale(0.4, 1);"></div>
+                                    </div>
+                                    <div class="noUi-origin" style="transform: translate(-80%, 0px); z-index: 5;">
+                                        <div class="noUi-handle noUi-handle-lower" data-handle="0" tabindex="0"
+                                             role="slider" aria-orientation="horizontal" aria-valuemin="0.0"
+                                             aria-valuemax="60.0" aria-valuenow="20.0" aria-valuetext="20.00"></div>
+                                    </div>
+                                    <div class="noUi-origin" style="transform: translate(-40%, 0px); z-index: 4;">
+                                        <div class="noUi-handle noUi-handle-upper" data-handle="1" tabindex="0"
+                                             role="slider" aria-orientation="horizontal" aria-valuemin="20.0"
+                                             aria-valuemax="100.0" aria-valuenow="60.0" aria-valuetext="60.00"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section section-navbars">
+                <div id="menu-dropdown" class="container">
+                    <div class="row">
+                        <div class="col-md-6"><h4>Menu</h4>
+                            <nav class="navbar bg-primary navbar-expand-lg navbar-relative">
+                                <div class="container">
+                                    <div class="navbar-translate"><a href="#" class="navbar-brand">Menu</a>
+                                        <button type="button" data-toggle="collapse" data-target="#example-navbar"
+                                                aria-controls="navbarSupportedContent" aria-expanded="false"
+                                                aria-label="Toggle navigation" class="navbar-toggler"><span
+                                                class="navbar-toggler-bar bar1"></span><span
+                                                class="navbar-toggler-bar bar2"></span><span
+                                                class="navbar-toggler-bar bar3"></span></button>
+                                        <button type="button" data-toggle="collapse" data-target="#navbar"
+                                                aria-controls="navbarSupportedContent" aria-expanded="false"
+                                                aria-label="Toggle navigation" class="navbar-toggler collapsed"><span
+                                                class="navbar-toggler-bar top-bar"></span><span
+                                                class="navbar-toggler-bar middle-bar"></span><span
+                                                class="navbar-toggler-bar bottom-bar"></span></button>
+                                    </div>
+                                    <div data-color="orange" id="navigation" class="navbar-collapse collapse">
+                                        <ul class="navbar-nav">
+                                            <li class="nav-item active"><a href="#" class="nav-link"><p>Link</p></a>
+                                            </li>
+                                            <li class="nav-item"><a href="#" class="nav-link"><p>Link</p></a></li>
+                                            <li aria-haspopup="true" class="dropdown nav-item dropdown"><a
+                                                    data-toggle="dropdown" class="dropdown-toggle nav-link"><i></i><span
+                                                    class="no-icon">Dropdown</span></a>
+                                                <ul class="dropdown-menu"><a href="#" class="dropdown-item">Action</a><a
+                                                        href="#" class="dropdown-item">Another action</a><a href="#"
+                                                                                                            class="dropdown-item">Something
+                                                    else here</a></ul>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </nav>
+                        </div>
+                        <div class="col-md-6"><h4>Menu with Icons</h4>
+                            <nav class="navbar bg-info navbar-expand-lg navbar-relative">
+                                <div class="container">
+                                    <div class="navbar-translate"><a href="#" class="navbar-brand">Icons</a>
+                                        <button type="button" data-toggle="collapse" data-target="#example-navbar-icons"
+                                                aria-controls="navbarSupportedContent" aria-expanded="false"
+                                                aria-label="Toggle navigation" class="navbar-toggler"><span
+                                                class="navbar-toggler-bar bar1"></span><span
+                                                class="navbar-toggler-bar bar2"></span><span
+                                                class="navbar-toggler-bar bar3"></span></button>
+                                        <button type="button" data-toggle="collapse" data-target="#navbar"
+                                                aria-controls="navbarSupportedContent" aria-expanded="false"
+                                                aria-label="Toggle navigation" class="navbar-toggler collapsed"><span
+                                                class="navbar-toggler-bar top-bar"></span><span
+                                                class="navbar-toggler-bar middle-bar"></span><span
+                                                class="navbar-toggler-bar bottom-bar"></span></button>
+                                    </div>
+                                    <div data-color="orange" id="navigation" class="navbar-collapse collapse">
+                                        <ul class="navbar-nav ml-auto">
+                                            <li class="nav-item"><a href="#pablo" class="nav-link"><i aria-hidden="true"
+                                                                                                      class="now-ui-icons ui-1_send"></i></a>
+                                            </li>
+                                            <li class="nav-item"><a href="#pablo" class="nav-link"><i aria-hidden="true"
+                                                                                                      class="now-ui-icons users_single-02"></i></a>
+                                            </li>
+                                            <li aria-haspopup="true" class="dropdown nav-item dropdown dropdown"><a
+                                                    data-toggle="dropdown" class="dropdown-toggle nav-link"><i
+                                                    class="now-ui-icons ui-1_settings-gear-63"></i><span
+                                                    class="no-icon"></span></a>
+                                                <ul class="dropdown-menu"><a class="dropdown-header">Dropdown header</a><a
+                                                        href="#" class="dropdown-item">Action</a><a href="#"
+                                                                                                    class="dropdown-item">Another
+                                                    action</a><a href="#" class="dropdown-item">Something else here</a>
+                                                    <div class="divider"></div>
+                                                    <a href="#" class="dropdown-item">Separated link</a>
+                                                    <div class="divider"></div>
+                                                    <a href="#" class="dropdown-item">One more separated link</a></ul>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                    <h4>Navigation</h4></div>
+                <div id="navbar">
+                    <div class="navigation-example" style="background-image: url(&quot;public/img/bg7.jpg&quot;);">
+                        <nav class="navbar bg-primary navbar-expand-lg navbar-relative">
+                            <div class="container">
+                                <div class="navbar-translate">
+                                    <div class="navbar-translate"><a href="#pablo" class="navbar-brand">Primary
+                                        color</a>
+                                        <button type="button" data-toggle="collapse"
+                                                data-target="#example-navbar-primary"
+                                                aria-controls="navbarSupportedContent" aria-expanded="false"
+                                                aria-label="Toggle navigation" class="navbar-toggler"><span
+                                                class="navbar-toggler-bar bar1"></span><span
+                                                class="navbar-toggler-bar bar2"></span><span
+                                                class="navbar-toggler-bar bar3"></span></button>
+                                    </div>
+                                    <button type="button" data-toggle="collapse" data-target="#navbar"
+                                            aria-controls="navbarSupportedContent" aria-expanded="false"
+                                            aria-label="Toggle navigation" class="navbar-toggler collapsed"><span
+                                            class="navbar-toggler-bar top-bar"></span><span
+                                            class="navbar-toggler-bar middle-bar"></span><span
+                                            class="navbar-toggler-bar bottom-bar"></span></button>
+                                </div>
+                                <div data-color="orange" id="navigation" class="navbar-collapse collapse">
+                                    <ul class="navbar-nav ml-auto">
+                                        <li class="nav-item active"><a href="#pablo" class="nav-link"><i
+                                                class="now-ui-icons objects_globe"></i>
+                                            <p>Discover</p></a></li>
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><i
+                                                class="now-ui-icons users_circle-08"></i>
+                                            <p>Profile</p></a></li>
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><i
+                                                class="now-ui-icons ui-1_settings-gear-63"></i>
+                                            <p>Settings</p></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </nav>
+                        <nav class="navbar bg-info navbar-expand-lg navbar-relative">
+                            <div class="container">
+                                <div class="navbar-translate">
+                                    <div class="navbar-translate"><a href="#pablo" class="navbar-brand">Info Color</a>
+                                        <button type="button" data-toggle="collapse" data-target="#example-navbar-info"
+                                                aria-controls="navbarSupportedContent" aria-expanded="false"
+                                                aria-label="Toggle navigation" class="navbar-toggler"><span
+                                                class="navbar-toggler-bar bar1"></span><span
+                                                class="navbar-toggler-bar bar2"></span><span
+                                                class="navbar-toggler-bar bar3"></span></button>
+                                    </div>
+                                    <button type="button" data-toggle="collapse" data-target="#navbar"
+                                            aria-controls="navbarSupportedContent" aria-expanded="false"
+                                            aria-label="Toggle navigation" class="navbar-toggler collapsed"><span
+                                            class="navbar-toggler-bar top-bar"></span><span
+                                            class="navbar-toggler-bar middle-bar"></span><span
+                                            class="navbar-toggler-bar bottom-bar"></span></button>
+                                </div>
+                                <div data-color="orange" id="navigation" class="navbar-collapse collapse">
+                                    <ul class="navbar-nav ml-auto">
+                                        <li class="nav-item active"><a href="#pablo" class="nav-link"><p>Discover</p>
+                                        </a></li>
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><p>Profile</p></a></li>
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><p>Settings</p></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </nav>
+                        <nav class="navbar bg-success navbar-expand-lg navbar-relative">
+                            <div class="container">
+                                <div class="navbar-translate">
+                                    <div class="navbar-translate"><a href="#" class="navbar-brand">Success Color</a>
+                                        <button type="button" data-toggle="collapse"
+                                                data-target="#example-navbar-success"
+                                                aria-controls="navbarSupportedContent" aria-expanded="false"
+                                                aria-label="Toggle navigation" class="navbar-toggler"><span
+                                                class="navbar-toggler-bar bar1"></span><span
+                                                class="navbar-toggler-bar bar2"></span><span
+                                                class="navbar-toggler-bar bar3"></span></button>
+                                    </div>
+                                    <button type="button" data-toggle="collapse" data-target="#navbar"
+                                            aria-controls="navbarSupportedContent" aria-expanded="false"
+                                            aria-label="Toggle navigation" class="navbar-toggler collapsed"><span
+                                            class="navbar-toggler-bar top-bar"></span><span
+                                            class="navbar-toggler-bar middle-bar"></span><span
+                                            class="navbar-toggler-bar bottom-bar"></span></button>
+                                </div>
+                                <div data-color="orange" id="navigation" class="navbar-collapse collapse">
+                                    <ul class="navbar-nav ml-auto">
+                                        <li class="nav-item active"><a href="#pablo" class="nav-link"><i
+                                                class="now-ui-icons objects_globe"></i></a></li>
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><i
+                                                class="now-ui-icons users_circle-08"></i></a></li>
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><i
+                                                class="now-ui-icons ui-1_settings-gear-63"></i></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </nav>
+                        <nav class="navbar bg-warning navbar-expand-lg navbar-relative">
+                            <div class="container">
+                                <div class="navbar-translate">
+                                    <div class="navbar-translate"><a href="#" class="navbar-brand">Success Color</a>
+                                        <button type="button" data-toggle="collapse"
+                                                data-target="#example-navbar-success"
+                                                aria-controls="navbarSupportedContent" aria-expanded="false"
+                                                aria-label="Toggle navigation" class="navbar-toggler"><span
+                                                class="navbar-toggler-bar bar1"></span><span
+                                                class="navbar-toggler-bar bar2"></span><span
+                                                class="navbar-toggler-bar bar3"></span></button>
+                                    </div>
+                                    <button type="button" data-toggle="collapse" data-target="#navbar"
+                                            aria-controls="navbarSupportedContent" aria-expanded="false"
+                                            aria-label="Toggle navigation" class="navbar-toggler collapsed"><span
+                                            class="navbar-toggler-bar top-bar"></span><span
+                                            class="navbar-toggler-bar middle-bar"></span><span
+                                            class="navbar-toggler-bar bottom-bar"></span></button>
+                                </div>
+                                <div data-color="orange" id="navigation" class="navbar-collapse collapse">
+                                    <ul class="navbar-nav ml-auto">
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><i
+                                                class="fab fa-facebook-square"></i></a></li>
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><i
+                                                class="fab fa-twitter"></i></a></li>
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><i
+                                                class="fab fa-google-plus"></i></a></li>
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><i
+                                                class="fab fa-instagram"></i></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </nav>
+                        <nav class="navbar bg-danger navbar-expand-lg navbar-relative">
+                            <div class="container">
+                                <div class="navbar-translate">
+                                    <div class="navbar-translate"><a href="#pablo" class="navbar-brand">Danger Color</a>
+                                        <button type="button" data-toggle="collapse"
+                                                data-target="#example-navbar-danger"
+                                                aria-controls="navbarSupportedContent" aria-expanded="false"
+                                                aria-label="Toggle navigation" class="navbar-toggler"><span
+                                                class="navbar-toggler-bar bar1"></span><span
+                                                class="navbar-toggler-bar bar2"></span><span
+                                                class="navbar-toggler-bar bar3"></span></button>
+                                    </div>
+                                    <button type="button" data-toggle="collapse" data-target="#navbar"
+                                            aria-controls="navbarSupportedContent" aria-expanded="false"
+                                            aria-label="Toggle navigation" class="navbar-toggler collapsed"><span
+                                            class="navbar-toggler-bar top-bar"></span><span
+                                            class="navbar-toggler-bar middle-bar"></span><span
+                                            class="navbar-toggler-bar bottom-bar"></span></button>
+                                </div>
+                                <div data-color="orange" id="navigation" class="navbar-collapse collapse">
+                                    <ul class="navbar-nav ml-auto">
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><i
+                                                class="fab fa-facebook-square"></i>
+                                            <p>Share</p></a></li>
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><i
+                                                class="fab fa-twitter"></i>
+                                            <p>Tweet</p></a></li>
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><i
+                                                class="fab fa-pinterest"></i>
+                                            <p>Pin</p></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </nav>
+                        <nav class="navbar navbar-transparent navbar-expand-lg navbar-relative">
+                            <div class="container">
+                                <div class="navbar-translate">
+                                    <div class="navbar-translate"><a href="#pablo" class="navbar-brand">Transparent</a>
+                                        <button type="button" data-toggle="collapse"
+                                                data-target="#example-navbar-transparent"
+                                                aria-controls="navbarSupportedContent" aria-expanded="false"
+                                                aria-label="Toggle navigation" class="navbar-toggler"><span
+                                                class="navbar-toggler-bar bar1"></span><span
+                                                class="navbar-toggler-bar bar2"></span><span
+                                                class="navbar-toggler-bar bar3"></span></button>
+                                    </div>
+                                    <button type="button" data-toggle="collapse" data-target="#navbar"
+                                            aria-controls="navbarSupportedContent" aria-expanded="false"
+                                            aria-label="Toggle navigation" class="navbar-toggler collapsed"><span
+                                            class="navbar-toggler-bar top-bar"></span><span
+                                            class="navbar-toggler-bar middle-bar"></span><span
+                                            class="navbar-toggler-bar bottom-bar"></span></button>
+                                </div>
+                                <div data-color="orange" id="navigation" class="navbar-collapse collapse">
+                                    <ul class="navbar-nav ml-auto">
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><i
+                                                class="fab fa-facebook-square"></i>
+                                            <p>Facebook</p></a></li>
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><i
+                                                class="fab fa-twitter"></i>
+                                            <p>Twitter</p></a></li>
+                                        <li class="nav-item"><a href="#pablo" class="nav-link"><i
+                                                class="fab fa-instagram"></i>
+                                            <p>Instagram</p></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <div class="section section-tabs">
+                <div class="container">
+                    <div class="title"><h4>Navigation Tabs</h4></div>
+                    <div class="row">
+                        <div class="col-md-10 ml-auto col-xl-6 mr-auto"><p class="category">Tabs with Icons on Card</p>
+                            <div class="card"><!----><!----><!----><!----><!----><!---->
+                                <div>
+                                    <div class="">
+                                        <ul role="tablist" class="nav nav-tabs-default nav-tabs">
+                                            <li data-toggle="tab" role="tablist" aria-expanded="true"
+                                                class="nav-item active"><a data-toggle="tab" role="tablist"
+                                                                           href="#undefined" aria-expanded="true"
+                                                                           class="nav-link active">
+                                                <div><i class="now-ui-icons objects_umbrella-13"></i> Home
+                                                </div>
+                                            </a></li>
+                                            <li data-toggle="tab" role="tablist" aria-expanded="true"
+                                                class="nav-item active"><a data-toggle="tab" role="tablist"
+                                                                           href="#undefined" class="nav-link">
+                                                <div><i class="now-ui-icons shopping_cart-simple"></i> Profile
+                                                </div>
+                                            </a></li>
+                                            <li data-toggle="tab" role="tablist" aria-expanded="true"
+                                                class="nav-item active"><a data-toggle="tab" role="tablist"
+                                                                           href="#undefined" class="nav-link">
+                                                <div><i class="now-ui-icons shopping_shop"></i> Messages
+                                                </div>
+                                            </a></li>
+                                            <li data-toggle="tab" role="tablist" aria-expanded="true"
+                                                class="nav-item active"><a data-toggle="tab" role="tablist"
+                                                                           href="#undefined" class="nav-link">
+                                                <div><i class="now-ui-icons ui-2_settings-90"></i> Settings
+                                                </div>
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="tab-content tab-space text-left tab-content-padding text-center">
+                                        <div class="tab-pane active" aria-expanded="true" style=""><p>
+                                            I think that’s a responsibility that I have, to push
+                                            possibilities, to show people, this is the level that things
+                                            could be at. So when you get something that has the name Kanye
+                                            West on it, it’s supposed to be pushing the furthest
+                                            possibilities. I will be the leader of a company that ends up
+                                            being worth billions of dollars, because I got the answers. I
+                                            understand culture. I am the nucleus.
+                                        </p></div>
+                                        <div class="tab-pane" style="display: none;"><p>
+                                            I will be the leader of a company that ends up being worth
+                                            billions of dollars, because I got the answers. I understand
+                                            culture. I am the nucleus. I think that’s a responsibility
+                                            that I have, to push possibilities, to show people, this is
+                                            the level that things could be at. I think that’s a
+                                            responsibility that I have, to push possibilities, to show
+                                            people, this is the level that things could be at.
+                                        </p></div>
+                                        <div class="tab-pane" style="display: none;"><p>
+                                            I think that’s a responsibility that I have, to push
+                                            possibilities, to show people, this is the level that things
+                                            could be at. So when you get something that has the name Kanye
+                                            West on it, it’s supposed to be pushing the furthest
+                                            possibilities. I will be the leader of a company that ends up
+                                            being worth billions of dollars, because I got the answers. I
+                                            understand culture. I am the nucleus.
+                                        </p></div>
+                                        <div class="tab-pane" style="display: none;"><p>
+                                            "I will be the leader of a company that ends up being worth
+                                            billions of dollars, because I got the answers. I understand
+                                            culture. I am the nucleus. I think that’s a responsibility
+                                            that I have, to push possibilities, to show people, this is
+                                            the level that things could be at."
+                                        </p></div>
+                                    </div>
+                                </div><!----><!----></div>
+                        </div>
+                        <div class="col-md-10 ml-auto col-xl-6 mr-auto"><p class="category">Tabs with Background on
+                            Card</p>
+                            <div class="card">
+                                <div>
+                                    <div class="card-header">
+                                        <ul role="tablist" data-background-color="orange"
+                                            class="nav nav-tabs-neutral nav-tabs justify-content-center">
+                                            <li data-toggle="tab" role="tablist" aria-expanded="true"
+                                                class="nav-item active"><a data-toggle="tab" role="tablist"
+                                                                           href="#undefined" aria-expanded="true"
+                                                                           class="nav-link active">
+                                                <div><i class="now-ui-icons objects_umbrella-13"></i> Home
+                                                </div>
+                                            </a></li>
+                                            <li data-toggle="tab" role="tablist" aria-expanded="true"
+                                                class="nav-item active"><a data-toggle="tab" role="tablist"
+                                                                           href="#undefined" class="nav-link">
+                                                <div><i class="now-ui-icons shopping_cart-simple"></i> Profile
+                                                </div>
+                                            </a></li>
+                                            <li data-toggle="tab" role="tablist" aria-expanded="true"
+                                                class="nav-item active"><a data-toggle="tab" role="tablist"
+                                                                           href="#undefined" class="nav-link">
+                                                <div><i class="now-ui-icons shopping_shop"></i> Messages
+                                                </div>
+                                            </a></li>
+                                            <li data-toggle="tab" role="tablist" aria-expanded="true"
+                                                class="nav-item active"><a data-toggle="tab" role="tablist"
+                                                                           href="#undefined" class="nav-link">
+                                                <div><i class="now-ui-icons ui-2_settings-90"></i> Settings
+                                                </div>
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="tab-content tab-space text-left card-body text-center">
+                                        <div class="tab-pane active" aria-expanded="true" style=""><p>
+                                            I think that’s a responsibility that I have, to push
+                                            possibilities, to show people, this is the level that things
+                                            could be at. So when you get something that has the name Kanye
+                                            West on it, it’s supposed to be pushing the furthest
+                                            possibilities. I will be the leader of a company that ends up
+                                            being worth billions of dollars, because I got the answers. I
+                                            understand culture. I am the nucleus.
+                                        </p></div>
+                                        <div class="tab-pane" style="display: none;"><p>
+                                            I will be the leader of a company that ends up being worth
+                                            billions of dollars, because I got the answers. I understand
+                                            culture. I am the nucleus. I think that’s a responsibility
+                                            that I have, to push possibilities, to show people, this is
+                                            the level that things could be at. I think that’s a
+                                            responsibility that I have, to push possibilities, to show
+                                            people, this is the level that things could be at.
+                                        </p></div>
+                                        <div class="tab-pane" style="display: none;"><p>
+                                            I think that’s a responsibility that I have, to push
+                                            possibilities, to show people, this is the level that things
+                                            could be at. So when you get something that has the name Kanye
+                                            West on it, it’s supposed to be pushing the furthest
+                                            possibilities. I will be the leader of a company that ends up
+                                            being worth billions of dollars, because I got the answers. I
+                                            understand culture. I am the nucleus.
+                                        </p></div>
+                                        <div class="tab-pane" style="display: none;"><p>
+                                            "I will be the leader of a company that ends up being worth
+                                            billions of dollars, because I got the answers. I understand
+                                            culture. I am the nucleus. I think that’s a responsibility
+                                            that I have, to push possibilities, to show people, this is
+                                            the level that things could be at."
+                                        </p></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section section-pagination">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6"><h4>Progress Bars</h4>
+                            <div class="progress-container progress-base progress-default"><span class="progress-badge">
+      Default
+    </span>
+                                <div class="progress" style="height: 1px;">
+                                    <div role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"
+                                         class="progress-bar" style="width: 25%;"><span
+                                            class="progress-value"> 25% </span></div>
+                                </div>
+                            </div>
+                            <div class="progress-container progress-base progress-primary"><span class="progress-badge">
+      Default
+    </span>
+                                <div class="progress" style="height: 1px;">
+                                    <div role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+                                         class="progress-bar" style="width: 60%;"><span
+                                            class="progress-value"> 60% </span></div>
+                                </div>
+                            </div>
+                            <h4>Navigation Pills</h4>
+                            <div>
+                                <div class="">
+                                    <ul role="tablist" class="nav nav-pills-primary nav-pills nav-pills-just-icons">
+                                        <li data-toggle="tab" role="tablist" aria-expanded="true"
+                                            class="nav-item active"><a data-toggle="tab" role="tablist"
+                                                                       href="#undefined" aria-expanded="true"
+                                                                       class="nav-link active">
+                                            <div><i class="far fa-gem"></i></div>
+                                        </a></li>
+                                        <li data-toggle="tab" role="tablist" aria-expanded="true"
+                                            class="nav-item active"><a data-toggle="tab" role="tablist"
+                                                                       href="#undefined" class="nav-link">
+                                            <div><i class="fa fa-thermometer-full"></i></div>
+                                        </a></li>
+                                        <li data-toggle="tab" role="tablist" aria-expanded="true"
+                                            class="nav-item active"><a data-toggle="tab" role="tablist"
+                                                                       href="#undefined" class="nav-link">
+                                            <div><i class="fa fa-suitcase"></i></div>
+                                        </a></li>
+                                        <li data-toggle="tab" role="tablist" aria-expanded="true"
+                                            class="nav-item active"><a data-toggle="tab" role="tablist"
+                                                                       href="#undefined" class="nav-link disabled">
+                                            <div><i class="fa fa-exclamation"></i></div>
+                                        </a></li>
+                                    </ul>
+                                </div>
+                                <div class="tab-content tab-space text-left">
+                                    <div class="tab-pane active" aria-expanded="true" style=""></div>
+                                    <div class="tab-pane" style="display: none;"></div>
+                                    <div class="tab-pane" style="display: none;"></div>
+                                    <div class="tab-pane" style="display: none;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6"><h4>Pagination</h4>
+                            <ul class="pagination pagination-primary">
+                                <li class="page-item prev-page disabled"><a aria-label="Previous"
+                                                                            class="page-link">»</a></li>
+                                <li class="page-item active"><a class="page-link">1</a></li>
+                                <li class="page-item"><a class="page-link">2</a></li>
+                                <li class="page-item"><a class="page-link">3</a></li>
+                                <li class="page-item"><a class="page-link">4</a></li>
+                                <li class="page-item"><a class="page-link">5</a></li>
+                                <li class="page-item page-pre next-page"><a aria-label="Next" class="page-link">»</a>
+                                </li>
+                            </ul>
+                            <ul class="pagination pagination-default">
+                                <li class="page-item prev-page"><a aria-label="Previous" class="page-link">»</a></li>
+                                <li class="page-item"><a class="page-link">1</a></li>
+                                <li class="page-item active"><a class="page-link">2</a></li>
+                                <li class="page-item"><a class="page-link">3</a></li>
+                                <li class="page-item"><a class="page-link">4</a></li>
+                                <li class="page-item"><a class="page-link">5</a></li>
+                                <li class="page-item page-pre next-page"><a aria-label="Next" class="page-link">»</a>
+                                </li>
+                            </ul>
+                            <br><h4>Labels</h4><span class="badge badge-default">Default</span><span
+                                    class="badge badge-primary">Primary</span><span
+                                    class="badge badge-success">Success</span><span class="badge badge-info">Info</span><span
+                                    class="badge badge-warning">Warning</span><span
+                                    class="badge badge-danger">Danger</span><span
+                                    class="badge badge-neutral">Neutral</span></div>
+                    </div>
+                </div>
+            </div>
+            <div id="notifications" class="section section-notifications">
+                <div class="space"></div>
+                <div class="container"><h4>Notifications</h4></div>
+                <div role="alert" class="alert alert-success">
+                    <div class="container">
+                        <div class="alert-icon"><i class="now-ui-icons ui-2_like"></i></div>
+                        <strong>Well done!</strong> You successfully read this important alert
+                        message.
+                        <button type="button" aria-label="Close" class="close"><span aria-hidden="true"><i
+                                class="now-ui-icons ui-1_simple-remove"></i></span></button>
+                    </div>
+                </div>
+                <div role="alert" class="alert alert-info">
+                    <div class="container">
+                        <div class="alert-icon"><i class="now-ui-icons travel_info"></i></div>
+                        <strong>Heads up!</strong> This alert needs your attention, but it's not
+                        super important.
+                        <button type="button" aria-label="Close" class="close"><span aria-hidden="true"><i
+                                class="now-ui-icons ui-1_simple-remove"></i></span></button>
+                    </div>
+                </div>
+                <div role="alert" class="alert alert-warning">
+                    <div class="container">
+                        <div class="alert-icon"><i class="now-ui-icons ui-1_bell-53"></i></div>
+                        <strong>Warning!</strong> Better check yourself, you're not looking too
+                        good.
+                        <button type="button" aria-label="Close" class="close"><span aria-hidden="true"><i
+                                class="now-ui-icons ui-1_simple-remove"></i></span></button>
+                    </div>
+                </div>
+                <div role="alert" class="alert alert-danger">
+                    <div class="container">
+                        <div class="alert-icon"><i class="now-ui-icons objects_support-17"></i></div>
+                        <strong>Oh snap!</strong> Change a few things up and try submitting again.
+                        <button type="button" aria-label="Close" class="close"><span aria-hidden="true"><i
+                                class="now-ui-icons ui-1_simple-remove"></i></span></button>
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <div class="container"><h3 class="title">Typography</h3>
+                    <div id="typography">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="typography-line"><h1><span>Header 1</span>The Life of Now UI Kit</h1></div>
+                                <div class="typography-line"><h2><span>Header 2</span>The Life of Now UI Kit</h2></div>
+                                <div class="typography-line"><h3><span>Header 3</span>The Life of Now UI Kit</h3></div>
+                                <div class="typography-line"><h4><span>Header 4</span>The Life of Now UI Kit</h4></div>
+                                <div class="typography-line"><h5><span>Header 5</span>The Life of Now UI Kit</h5></div>
+                                <div class="typography-line"><h6><span>Header 6</span>The Life of Now UI Kit</h6></div>
+                                <div class="typography-line"><p><span>Paragraph</span>
+                                    I will be the leader of a company that ends up being worth
+                                    billions of dollars, because I got the answers. I understand
+                                    culture. I am the nucleus. I think that’s a responsibility that
+                                    I have, to push possibilities, to show people, this is the level
+                                    that things could be at.
+                                </p></div>
+                                <div class="typography-line"><span>Quote</span>
+                                    <blockquote><p class="blockquote blockquote-primary">
+                                        "I will be the leader of a company that ends up being worth
+                                        billions of dollars, because I got the answers. I understand
+                                        culture. I am the nucleus. I think that’s a responsibility
+                                        that I have, to push possibilities, to show people, this is
+                                        the level that things could be at."
+                                        <br><br><small>
+                                        - Noaa
+                                    </small></p></blockquote>
+                                </div>
+                                <div class="typography-line"><span>Muted Text</span>
+                                    <p class="text-muted">
+                                        I will be the leader of a company that ends up being worth
+                                        billions of dollars, because I got the answers...
+                                    </p></div>
+                                <div class="typography-line"><span>Primary Text</span>
+                                    <p class="text-primary">
+                                        I will be the leader of a company that ends up being worth
+                                        billions of dollars, because I got the answers...
+                                    </p></div>
+                                <div class="typography-line"><span>Info Text</span>
+                                    <p class="text-info">
+                                        I will be the leader of a company that ends up being worth
+                                        billions of dollars, because I got the answers...
+                                    </p></div>
+                                <div class="typography-line"><span>Success Text</span>
+                                    <p class="text-success">
+                                        I will be the leader of a company that ends up being worth
+                                        billions of dollars, because I got the answers...
+                                    </p></div>
+                                <div class="typography-line"><span>Warning Text</span>
+                                    <p class="text-warning">
+                                        I will be the leader of a company that ends up being worth
+                                        billions of dollars, because I got the answers...
+                                    </p></div>
+                                <div class="typography-line"><span>Danger Text</span>
+                                    <p class="text-danger">
+                                        I will be the leader of a company that ends up being worth
+                                        billions of dollars, because I got the answers...
+                                    </p></div>
+                                <div class="typography-line"><h2><span>Small Tag</span>
+                                    Header with small subtitle
+                                    <br><small>Use "small" tag for the headers</small></h2></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-50"></div>
+                    <div id="images"><h4>Images</h4>
+                        <div class="row">
+                            <div class="col-sm-2"><p class="category">Image</p><img alt="Rounded Image" class="rounded"
+                                                                                    data-src="public/img/julie.jpg"
+                                                                                    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                                                                                    lazy="loading"></div>
+                            <div class="col-sm-2"><p class="category">Circle Image</p><img alt="Circle Image"
+                                                                                           class="rounded-circle"
+                                                                                           data-src="public/img/julie.jpg"
+                                                                                           src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                                                                                           lazy="loading"></div>
+                            <div class="col-sm-2"><p class="category">Raised</p><img alt="Raised Image"
+                                                                                     class="rounded img-raised"
+                                                                                     data-src="public/img/julie.jpg"
+                                                                                     src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                                                                                     lazy="loading"></div>
+                            <div class="col-sm-2"><p class="category">Circle Raised</p><img alt="Thumbnail Image"
+                                                                                            class="rounded-circle img-raised"
+                                                                                            data-src="public/img/julie.jpg"
+                                                                                            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                                                                                            lazy="loading"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="javascriptComponents" class="section section-javascript">
+                <div class="container"><h3 class="title">Javascript components</h3>
+                    <div id="modals" class="row">
+                        <div class="col-md-6 modal-buttons"><h4>Modal</h4>
+                            <button type="button" class="btn btn-primary"><!---->
+                                Launch Modal
+                                <!----></button>
+                            <button type="button" class="btn btn-warning"><!---->
+                                Launch Modal Mini
+                                <!----></button>
+                        </div>
+                        <div class="col-md-6 popover-buttons"><h4>Popovers</h4><span><div role="tooltip"
+                                                                                          id="el-popover-5817"
+                                                                                          aria-hidden="true"
+                                                                                          class="el-popover el-popper popover popover-primary"
+                                                                                          tabindex="0"
+                                                                                          style="width: 200px; display: none;"><!----><h3
+                                class="popover-header">Popover On Left</h3><div class="popover-body">
+            Here will be some very useful information about his popover.
+          </div></div></span><span><div role="tooltip" id="el-popover-7833" aria-hidden="true"
+                                        class="el-popover el-popper popover popover-success" tabindex="0"
+                                        style="width: 200px; display: none;"><!----><h3 class="popover-header">Popover On Top</h3><div
+                                class="popover-body">
+            Here will be some very useful information about his popover.
+          </div></div></span><span><div role="tooltip" id="el-popover-483" aria-hidden="true"
+                                        class="el-popover el-popper popover popover-danger" tabindex="0"
+                                        style="width: 200px; display: none;"><!----><h3 class="popover-header">Popover On Right</h3><div
+                                class="popover-body">
+            Here will be some very useful information about his popover.
+          </div></div></span><span><div role="tooltip" id="el-popover-5039" aria-hidden="true"
+                                        class="el-popover el-popper popover" tabindex="0"
+                                        style="width: 200px; display: none;"><!----><h3 class="popover-header">Popover On Bottom</h3><div
+                                class="popover-body">
+            Here will be some very useful information about his popover.
+          </div></div></span>
+                            <button type="button" class="btn btn-default el-popover__reference"
+                                    aria-describedby="el-popover-5817" tabindex="0"><!---->
+                                On left
+                                <!----></button>
+                            <button type="button" class="btn btn-default el-popover__reference"
+                                    aria-describedby="el-popover-7833" tabindex="0"><!---->
+                                On top
+                                <!----></button>
+                            <button type="button" class="btn btn-default el-popover__reference"
+                                    aria-describedby="el-popover-483" tabindex="0"><!---->
+                                On right
+                                <!----></button>
+                            <button type="button" class="btn btn-default el-popover__reference"
+                                    aria-describedby="el-popover-5039" tabindex="0"><!---->
+                                On bottom
+                                <!----></button>
+                        </div>
+                        <br><br>
+                        <div class="col-md-6"><h4>Datetimepicker</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="datepicker-container">
+                                        <div class="form-group"><!---->
+                                            <div class=""><!---->
+                                                <div class="el-date-editor el-input el-input--prefix el-input--suffix el-date-editor--date">
+                                                    <!----><input type="text" autocomplete="off" name=""
+                                                                  placeholder="Date Time Picker"
+                                                                  class="el-input__inner"><span
+                                                        class="el-input__prefix"><i
+                                                        class="el-input__icon el-icon-date"></i><!----></span><span
+                                                        class="el-input__suffix"><span class="el-input__suffix-inner"><i
+                                                        class="el-input__icon"></i><!----><!----><!----><!----></span>
+                                                    <!----></span><!----><!----></div><!----><!----></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 tooltip-buttons"><h4>Tooltips</h4>
+                            <button type="button" class="btn el-tooltip btn btn-default btn-tooltip item btn-default"
+                                    aria-describedby="el-tooltip-8622" tabindex="0"><!---->On left<!----></button>
+                            <button type="button" class="btn el-tooltip btn btn-default btn-tooltip item btn-default"
+                                    aria-describedby="el-tooltip-3127" tabindex="0"><!---->On top<!----></button>
+                            <button type="button" class="btn el-tooltip btn btn-default btn-tooltip item btn-default"
+                                    aria-describedby="el-tooltip-3634" tabindex="0"><!---->On bottom<!----></button>
+                            <button type="button" class="btn el-tooltip btn btn-default btn-tooltip item btn-default"
+                                    aria-describedby="el-tooltip-8221" tabindex="0"><!---->On right<!----></button>
+                            <div class="clearfix"></div>
+                            <br><br></div>
+                    </div>
+                </div>
+                <div tabindex="-1" role="dialog" aria-hidden="true" class="modal fade d-none" style="display: none;">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header justify-content-center">
+                                <button type="button" data-dismiss="modal" aria-hidden="true" class="close"><i
+                                        class="now-ui-icons ui-1_simple-remove"></i></button>
+                                <h4 class="title title-up">Modal title</h4></div>
+                            <div class="modal-body"><p>
+                                Far far away, behind the word mountains, far from the countries Vokalia
+                                and Consonantia, there live the blind texts. Separated they live in
+                                Bookmarksgrove right at the coast of the Semantics, a large language
+                                ocean. A small river named Duden flows by their place and supplies it
+                                with the necessary regelialia. It is a paradisematic country, in which
+                                roasted parts of sentences fly into your mouth.
+                            </p></div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default"><!---->Nice Button<!----></button>
+                                <button type="button" class="btn btn-danger"><!---->Close<!----></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div tabindex="-1" role="dialog" aria-hidden="true" class="modal fade modal-primary d-none modal-mini"
+                     style="display: none;">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header justify-content-center"><!---->
+                                <div class="modal-profile"><i class="now-ui-icons users_circle-08"></i></div>
+                            </div>
+                            <div class="modal-body"><p>Always have an access to your profile</p></div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-link btn-neutral"><!---->Back<!----></button>
+                                <button type="button" class="btn btn-link btn-neutral"><!---->Close<!----></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="carousel" class="section">
+                <div class="container">
+                    <div class="title"><h4>Carousel</h4></div>
+                    <div class="row justify-content-center">
+                        <div class="col-8">
+                            <div class="el-carousel el-carousel--horizontal">
+                                <div class="el-carousel__container" style="height: 500px;">
+                                    <button type="button" class="el-carousel__arrow el-carousel__arrow--left"
+                                            style="display: none;"><i class="el-icon-arrow-left"></i></button>
+                                    <button type="button" class="el-carousel__arrow el-carousel__arrow--right"
+                                            style="display: none;"><i class="el-icon-arrow-right"></i></button>
+                                    <div class="el-carousel__item is-animating"
+                                         style="transform: translateX(-730px) scale(1);"><!----><img
+                                            src="public/img/bg1.jpg" alt="First slide" class="d-block">
+                                        <div class="carousel-caption d-none d-md-block"><h5>Nature, United States</h5>
+                                        </div>
+                                    </div>
+                                    <div class="el-carousel__item is-active is-animating"
+                                         style="transform: translateX(0px) scale(1);"><!----><img
+                                            src="public/img/bg3.jpg" alt="Second slide" class="d-block">
+                                        <div class="carousel-caption d-none d-md-block"><h5>Somewhere Beyond, United
+                                            States</h5></div>
+                                    </div>
+                                    <div class="el-carousel__item" style="transform: translateX(730px) scale(1);">
+                                        <!----><img src="public/img/bg4.jpg" alt="Third slide" class="d-block">
+                                        <div class="carousel-caption d-none d-md-block"><h5>Yellowstone National Park,
+                                            United States</h5></div>
+                                    </div>
+                                </div>
+                                <ul class="el-carousel__indicators el-carousel__indicators--horizontal">
+                                    <li class="el-carousel__indicator el-carousel__indicator--horizontal">
+                                        <button class="el-carousel__button"><!----></button>
+                                    </li>
+                                    <li class="el-carousel__indicator el-carousel__indicator--horizontal is-active">
+                                        <button class="el-carousel__button"><!----></button>
+                                    </li>
+                                    <li class="el-carousel__indicator el-carousel__indicator--horizontal">
+                                        <button class="el-carousel__button"><!----></button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section section-nucleo-icons">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-12"><h2 class="title">Nucleo Icons</h2><h5 class="description">
+                            Now UI Kit comes with 100 custom icons made by our friends from
+                            NucleoApp. The official package contains over 2.100 thin icons which
+                            are looking great in combination with Now UI Kit Make sure you check
+                            all of them and use those that you like the most.
+                        </h5><a href="https://demos.creative-tim.com/now-ui-kit/nucleo-icons.html" target="_blank"
+                                class="btn btn-primary btn-round btn-lg">View Demo Icons</a><a
+                                href="https://nucleoapp.com/?ref=1712" target="_blank"
+                                class="btn btn-primary btn-simple btn-round btn-lg">View All Icons</a></div>
+                        <div class="col-lg-6 col-md-12">
+                            <div class="icons-container"><i class="now-ui-icons ui-1_send"></i><i
+                                    class="now-ui-icons ui-2_like"></i><i
+                                    class="now-ui-icons transportation_air-baloon"></i><i
+                                    class="now-ui-icons text_bold"></i><i class="now-ui-icons tech_headphones"></i><i
+                                    class="now-ui-icons emoticons_satisfied"></i><i
+                                    class="now-ui-icons shopping_cart-simple"></i><i
+                                    class="now-ui-icons objects_spaceship"></i><i
+                                    class="now-ui-icons media-2_note-03"></i><i
+                                    class="now-ui-icons ui-2_favourite-28"></i><i
+                                    class="now-ui-icons design_palette"></i><i class="now-ui-icons clothes_tie-bow"></i><i
+                                    class="now-ui-icons location_pin"></i><i class="now-ui-icons objects_key-25"></i><i
+                                    class="now-ui-icons travel_istanbul"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <div class="container text-center">
+                    <div class="row justify-content-md-center">
+                        <div class="col-md-12 col-lg-8"><h2 class="title">Completed with examples</h2><h5
+                                class="description">
+                            The kit comes with three pre-built pages to help you get started
+                            faster. You can change the text and images and you're good to go.
+                            More importantly, looking at them will give you a picture of what
+                            you can built with this powerful Bootstrap 4 ui kit.
+                        </h5></div>
+                    </div>
+                </div>
+            </div>
+            <div class="section section-signup"
+                 style="background-image: url(&quot;public/img/bg11.jpg&quot;); background-size: cover; background-position: center top; min-height: 700px;">
+                <div class="container">
+                    <div class="row">
+                        <div data-background-color="orange" class="card card-signup"><!----><!----><!----><!---->
+                            <div class="card-header text-center"><h3 class="card-title title-up">Sign Up</h3>
+                                <div class="social-line"><a href="#pablo"
+                                                            class="btn btn-neutral btn-facebook btn-icon btn-round"><i
+                                        class="fab fa-facebook-square"></i></a><a href="#pablo"
+                                                                                  class="btn btn-neutral btn-twitter btn-icon btn-lg btn-round"><i
+                                        class="fab fa-twitter"></i></a><a href="#pablo"
+                                                                          class="btn btn-neutral btn-google btn-icon btn-round"><i
+                                        class="fab fa-google-plus"></i></a></div>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group no-border input-group"><!---->
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><i
+                                                class="input-group-text now-ui-icons users_circle-08"></i></div>
+                                        <input aria-describedby="addon-right addon-left" placeholder="First Name..."
+                                               class="form-control"><!----><!----></div>
+                                </div>
+                                <div class="form-group no-border input-group"><!---->
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><i
+                                                class="input-group-text now-ui-icons text_caps-small"></i></div>
+                                        <input aria-describedby="addon-right addon-left" placeholder="Last Name..."
+                                               class="form-control"><!----><!----></div>
+                                </div>
+                                <div class="form-group no-border input-group"><!---->
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><i
+                                                class="input-group-text now-ui-icons ui-1_email-85"></i></div>
+                                        <input aria-describedby="addon-right addon-left" placeholder="Email"
+                                               class="form-control"><!----><!----></div>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <button type="button" class="btn btn-round btn-neutral btn-lg"><!---->Get Started
+                                        <!----></button>
+                                </div>
+                            </div><!----><!----></div>
+                    </div>
+                    <div class="col text-center"><a href="#/login" class="btn btn-simple btn-round btn-white btn-lg">
+                        View Login Page
+                    </a></div>
+                </div>
+            </div>
         </div>
     </div>
-</footer>
-<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-        crossorigin="anonymous"></script>
+    <footer data-background-color="black" class="footer">
+        <div class="container">
+            <nav>
+                <ul>
+                    <li><a href="">
+                        Zero Dawn
+                    </a></li>
+                    <li><a href="https:///presentation.creative-tim.com">
+                        About Us
+                    </a></li>
+                    <li><a href="https:///blog.creative-tim.com">
+                        Blog
+                    </a></li>
+                </ul>
+            </nav>
+            <div class="copyright">
+                © 2020, Designed by
+                <a href="" target="_blank" rel="noopener">Zero Dawn</a>.
+            </div>
+        </div>
+    </footer>
+</div>
 </body>
 </html>
