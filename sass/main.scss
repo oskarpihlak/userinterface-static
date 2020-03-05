@@ -1,13 +1,9 @@
-@import 'bootstrap';
+@import "style";
+.flex-wrap {
+  display: flex;
+  flex-flow: wrap;
+}
 
-@import "base";
-@import "typography";
-
-@import "sidebar";
-@import "header";
-@import "realtors";
-@import "features";
-@import "story";
-@import "homes";
-@import "gallery";
-@import "footer";
+.image-margin {
+  margin-bottom: 20px;
+}
