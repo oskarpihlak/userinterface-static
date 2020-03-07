@@ -1,4 +1,12 @@
-@import "style";
+@import "base";
+@import "animations";
+@import "header";
+@import "intro";
+@import "nav";
+@import "sections/index";
+@import "media.queries";
+@import "footer";
+
 .flex-wrap {
   display: flex;
   flex-flow: wrap;
@@ -6,4 +14,10 @@
 
 .image-margin {
   margin-bottom: 20px;
+}
+
+.center-flex-content {
+  align-items: center;
+  display: flex;
+  flex-flow: column;
 }
